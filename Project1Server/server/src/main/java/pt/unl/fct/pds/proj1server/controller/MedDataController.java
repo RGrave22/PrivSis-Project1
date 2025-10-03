@@ -33,7 +33,36 @@ public class MedDataController {
 
     @PostMapping("/count")
     public CountResponse getMedDataCount(@RequestBody CountRequest countRequest) {
-        // TODO: Implement 
-        return new CountResponse(countRequest.getAttribute(), 0);
+        String attribute = countRequest.getAttribute();
+        String value = countRequest.getValue();
+        long count = 0;
+
+        switch (attribute.toLowerCase()) {
+            case "gender":
+                count = medDataRepository.countByGender(value);
+                break;
+            case "diagnosis":
+                count = medDataRepository.countByDiagnosis(value);
+                break;
+            case "age":
+                try {
+                    int ageValue = Integer.parseInt(value);
+                    count = medDataRepository.countByAge(ageValue);
+                } catch (NumberFormatException e) {
+                    throw new ResponseStatusException(
+                            HttpStatus.BAD_REQUEST, "Age must be a valid number");
+                }
+                break;
+            
+            case "postal_code":
+                count = medDataRepository.countByPostalCode(value);
+                break;
+            default:
+                throw new ResponseStatusException(
+                        HttpStatus.BAD_REQUEST, 
+                        "Invalid attribute. Supported attributes: gender, diagnosis, age, postalCode");
+        }
+
+        return new CountResponse(attribute, (int) count);
     }
 }

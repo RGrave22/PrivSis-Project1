@@ -23,14 +23,21 @@ def main():
         med_csv = csv.reader(med_file)
 
         for line in med_csv:
+            # Insert into full med_data table (with PII)
             row = MED_TABLE.insert().values(id=line[0], name=line[1], age=line[2],
                 address=line[3], email=line[4], gender=line[5], postal_code=line[6],
                 diagnosis=line[7])
             CONN.execute(row)
 
-        #ADDED to create the med_data_deidentified table
+        CONN.commit()
+
+    # Re-open file to insert de-identified data
+    with open("./Data/med.csv", 'r') as med_file:
+        med_csv = csv.reader(med_file)
+
         for line in med_csv:
-            row = MED_DI_TABLE.insert().values(id=line[0], age=line[1], gender=line[2], diagnosis=line[3])
+            # Insert into de-identified table (WITHOUT PII: name, email, address, postal_code)
+            row = MED_DI_TABLE.insert().values(id=line[0], age=line[2], gender=line[5], diagnosis=line[7])
             CONN.execute(row)
 
         CONN.commit()

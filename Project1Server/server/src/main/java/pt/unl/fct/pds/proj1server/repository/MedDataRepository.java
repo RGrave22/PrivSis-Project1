@@ -6,5 +6,8 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface MedDataRepository extends JpaRepository<MedData, Long> {
-    // Custom query methods can be defined here
+    long countByGender(String gender);
+    long countByDiagnosis(String diagnosis);
+    long countByAge(int age);
+    long countByPostalCode(String postalCode);
 }

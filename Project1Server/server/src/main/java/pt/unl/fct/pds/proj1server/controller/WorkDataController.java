@@ -30,10 +30,35 @@ public class WorkDataController {
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.NOT_FOUND, "WorkData not found with id: " + id));
     }
-
+ 
     @PostMapping("/count")
     public CountResponse getWorkDataCount(@RequestBody CountRequest countRequest ) {
-        // TODO: Implement 
-        return new CountResponse(countRequest.getAttribute(), 0);
+        String value = countRequest.getValue();
+        long count = 0;
+        String attribute = countRequest.getAttribute();
+
+        switch (attribute.toLowerCase()) {
+            case "postalcode":
+            case "postal_code":
+                count = workDataRepository.countByPostalCode(value);
+                break;
+            case "education":
+                count = workDataRepository.countByEducation(value);
+                break;
+            case "gender":
+                count = workDataRepository.countByGender(value);
+                break;
+            case "workplace":
+                count = workDataRepository.countByWorkplace(value);
+                break;
+            case "department":
+                count = workDataRepository.countByDepartment(value);
+                break;
+            default:
+                throw new ResponseStatusException(
+                        HttpStatus.BAD_REQUEST, "Unsupported attribute: " + attribute);
+        }
+
+        return new CountResponse(attribute, (int) count);
     }
 }
