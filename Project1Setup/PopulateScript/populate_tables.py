@@ -30,8 +30,8 @@ def main():
 
         #ADDED to create the med_data_deidentified table
         for line in med_csv:
-                    row = MED_DI_TABLE.insert().values(id=line[0], age=line[2], gender=line[5], diagnosis=line[7])
-                    CONN.execute(row)
+            row = MED_DI_TABLE.insert().values(id=line[0], age=line[1], gender=line[2], diagnosis=line[3])
+            CONN.execute(row)
 
         CONN.commit()
 
