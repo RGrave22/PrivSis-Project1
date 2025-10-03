@@ -1,0 +1,45 @@
+package pt.unl.fct.pds.proj1server.model;
+
+import jakarta.persistence.*;
+
+@Entity
+@Table(name = "med_data_deidentified")
+public class MedDataDeidentified {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    @Column(nullable = false)
+    private int age;
+    @Column(nullable = false)
+    private String gender;
+    @Column(nullable = false)
+    private String diagnosis;
+
+    public MedDataDeidentified() {
+    }
+
+    public MedDataDeidentified(Long id,
+                   int age,
+                   String gender,
+                   String postalCode,
+                   String diagnosis) {
+        this.id = id;
+        this.age = age;
+        this.gender = gender;
+        this.diagnosis = diagnosis;
+    }
+
+    public Long getId() {return id;}
+
+    public int getAge() {return age;}
+    public String getGender() {return gender;}
+    public String getDiagnosis() {return diagnosis;}
+
+    public void setId(Long id) {this.id = id;}
+    public void setAge(int age) {this.age = age;}
+    public void setGender(String gender) {this.gender = gender;}
+    public void setDiagnosis(String Diagnosis) {this.diagnosis = diagnosis;}
+}
+
+
