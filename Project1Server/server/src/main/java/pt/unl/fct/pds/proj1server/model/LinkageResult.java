@@ -17,7 +17,7 @@ public class LinkageResult {
     private String workplace;
     private String department;
     
-    // Attack metadata
+    // Attack metadatas
     private String matchedOn;  
     private boolean successfulReidentification;
 
