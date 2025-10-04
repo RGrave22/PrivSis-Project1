@@ -2,13 +2,11 @@ package pt.unl.fct.pds.proj1server.model;
 
 
 public class LinkageResult {
-    // Medical data "de-identified"
     private Long medDataId;
     private int age;
     private String gender;
     private String diagnosis;
     
-    // Work data that was linked (auxiliary information)
     private Long workDataId;
     private String firstName;
     private String lastName;
@@ -17,8 +15,7 @@ public class LinkageResult {
     private String workplace;
     private String department;
     
-    // Attack metadatas
-    private String matchedOn;  
+    private String matchedOn;
     private boolean successfulReidentification;
 
     public LinkageResult() {}
@@ -42,7 +39,6 @@ public class LinkageResult {
         this.successfulReidentification = true;
     }
 
-    // Getters and Setters
     public Long getMedDataId() { return medDataId; }
     public void setMedDataId(Long medDataId) { this.medDataId = medDataId; }
 

@@ -6,7 +6,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface MedDataDeidentifiedRepository extends JpaRepository<MedDataDeidentified, Long> {
-    // Query methods for de-identified data
     long countByGender(String gender);
     long countByDiagnosis(String diagnosis);
     long countByAge(int age);

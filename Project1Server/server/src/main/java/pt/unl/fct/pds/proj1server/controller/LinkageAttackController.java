@@ -35,8 +35,7 @@ public class LinkageAttackController {
 
         for (MedData med : medDataList) {
             for (WorkData work : workDataList) {
-                // Match on postal_code AND gender (common quasi-identifiers)
-                if (med.getPostalCode().equals(work.getPostalCode()) && 
+                if (med.getPostalCode().equals(work.getPostalCode()) &&
                     med.getGender().equalsIgnoreCase(work.getGender())) {
                     
                     LinkageResult result = new LinkageResult(
