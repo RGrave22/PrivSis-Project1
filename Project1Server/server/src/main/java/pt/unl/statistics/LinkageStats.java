@@ -1,4 +1,4 @@
-package pt.unl.Statistics;
+package pt.unl.statistics;
 
 
 public class LinkageStats {

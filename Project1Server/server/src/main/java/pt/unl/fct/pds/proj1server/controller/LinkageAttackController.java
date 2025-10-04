@@ -7,7 +7,7 @@ import pt.unl.fct.pds.proj1server.repository.MedDataRepository;
 import pt.unl.fct.pds.proj1server.repository.WorkDataRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import pt.unl.Statistics.LinkageStats;
+import pt.unl.statistics.LinkageStats;
 
 import java.util.ArrayList;
 import java.util.List;
