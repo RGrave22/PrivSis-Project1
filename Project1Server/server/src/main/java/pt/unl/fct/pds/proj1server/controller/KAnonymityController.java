@@ -257,7 +257,7 @@ public class KAnonymityController {
         return "*";
     }
 
-    // Maybe create a new file for this class
+    // Maybe create a new file for this class //Yes
     static class LinkageAttackResult {
         private int kValue;
         private long totalEquivalenceClasses;

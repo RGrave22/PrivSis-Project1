@@ -38,7 +38,7 @@ public class WorkDataController {
         String attribute = countRequest.getAttribute();
 
         switch (attribute.toLowerCase()) {
-            case "postalcode":
+            //case "postalcode":
             case "postal_code":
                 count = workDataRepository.countByPostalCode(value);
                 break;
