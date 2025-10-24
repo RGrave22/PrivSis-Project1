@@ -147,7 +147,7 @@ public class MedDataDiffPrivController {
         } else {
             throw new ResponseStatusException(
                 HttpStatus.BAD_REQUEST,
-                "Invalid attribute format. Use 'age', 'age:gender:Male', or 'age:diagnosis:Diabetes'");
+                "Invalid attribute format. Use 'age', 'age:gender:<genderValue>', or 'age:diagnosis:<diagnosisValue>>'");
         }
 
         // Formula q tou a usar (sum + noise) / (count + noise) qualquer cena mudar
