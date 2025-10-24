@@ -63,6 +63,6 @@ public class MedDataController {
                         "Invalid attribute. Supported attributes: gender, diagnosis, age, postalCode");
         }
 
-        return new CountResponse(attribute, (int) count);
+        return new CountResponse(attribute, (int) count, 0,0);
     }
 }

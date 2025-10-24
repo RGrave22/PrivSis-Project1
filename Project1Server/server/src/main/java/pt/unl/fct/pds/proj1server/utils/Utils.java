@@ -11,6 +11,7 @@ public class Utils {
         double scale = sensitivity / epsilon;
 
         double noise = laplace(0.0, scale);
+        System.out.println("noise: " + noise);
         return trueValue + noise;
     }
 

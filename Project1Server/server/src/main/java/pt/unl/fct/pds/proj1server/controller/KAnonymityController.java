@@ -2,10 +2,11 @@ package pt.unl.fct.pds.proj1server.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import pt.unl.fct.pds.proj1server.model.KAnonymizedData;
-import pt.unl.fct.pds.proj1server.model.MedData;
+import pt.unl.fct.pds.proj1server.model.*;
 import pt.unl.fct.pds.proj1server.repository.MedDataRepository;
+import pt.unl.fct.pds.proj1server.repository.WorkDataRepository;
 import pt.unl.statistics.KAnonymityStats;
+import pt.unl.statistics.LinkageStats;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -16,6 +17,9 @@ public class KAnonymityController {
 
     @Autowired
     private MedDataRepository medDataRepository;
+
+    @Autowired
+    private WorkDataRepository workDataRepository;
 
     @GetMapping
     public List<KAnonymizedData> getKAnonymizedData(@RequestParam(defaultValue = "2") int k) {
@@ -58,25 +62,70 @@ public class KAnonymityController {
     }
 
     @GetMapping("/test-attack")
-    public LinkageAttackResult testLinkageAttack(@RequestParam(defaultValue = "2") int k) {
+    public List<KAnonimityLinkageResult> testLinkageAttack(@RequestParam(defaultValue = "2") int k) {
         List<KAnonymizedData> anonymized = getKAnonymizedData(k);
-        
-        long totalEquivalenceClasses = anonymized.size();
-        long uniquelyIdentifiable = anonymized.stream()
-            .filter(data -> data.getEquivalenceClassSize() == 1)
-            .count();
-        
-        double vulnerabilityRate = totalEquivalenceClasses > 0 ?
-            (double) uniquelyIdentifiable / totalEquivalenceClasses * 100 : 0;
-        
-        return new LinkageAttackResult(
-            k,
-            totalEquivalenceClasses,
-            uniquelyIdentifiable,
-            vulnerabilityRate,
-            vulnerabilityRate < 10 ? "GOOD - Most records protected" :
-            vulnerabilityRate < 30 ? "MODERATE - Some vulnerability" :
-            "POOR - Many records at risk"
+        List<WorkData> workDataList = workDataRepository.findAll();
+
+        List<KAnonimityLinkageResult> results = new ArrayList<>();
+
+        for (KAnonymizedData med : anonymized) {
+            for (WorkData work : workDataList) {
+                if (med.getPostalCodePrefix().equals(work.getPostalCode()) &&
+                        med.getGender().equalsIgnoreCase(work.getGender())) {
+
+                    KAnonimityLinkageResult result = new KAnonimityLinkageResult(
+                            med.getAgeRange(),
+                            med.getGender(),
+                            med.getDiagnosis(),
+                            work.getId(),
+                            work.getFName(),
+                            work.getLName(),
+                            work.getPostalCode(),
+                            work.getEducation(),
+                            work.getWorkplace(),
+                            work.getDepartment(),
+                            "postal_code + gender"
+                    );
+
+                    results.add(result);
+                }
+            }
+        }
+
+
+        return results;
+    }
+
+    @GetMapping("/attack-stats")
+    public LinkageStats statsLinkageAttack(@RequestParam(defaultValue = "2") int k) {
+        List<KAnonimityLinkageResult> results = testLinkageAttack(k);
+
+        long totalMedRecords = getKAnonymizedData(k).size();
+        long totalWorkRecords = workDataRepository.count();
+        long successfulMatches = results.size();
+
+        double successRate = totalMedRecords > 0 ?
+                (double) successfulMatches / totalMedRecords * 100 : 0;
+
+        Map<String, Integer> quasiIdentifierCounts = new HashMap<>();
+        for (KAnonimityLinkageResult result : results) {
+            String key = result.getPostalCode() + "|" + result.getGender();
+            quasiIdentifierCounts.put(key, quasiIdentifierCounts.getOrDefault(key, 0) + 1);
+        }
+
+        long uniqueMatches = quasiIdentifierCounts.values().stream().filter(count -> count == 1).count();
+        double uniquenessRate = successfulMatches > 0 ?
+                (double) uniqueMatches / successfulMatches * 100 : 0;
+
+        return new LinkageStats(
+                totalMedRecords,
+                totalWorkRecords,
+                successfulMatches,
+                successRate,
+                uniqueMatches,
+                uniquenessRate,
+                "postal_code + gender",
+                "Much better with k-anonimity!"
         );
     }
 
@@ -106,7 +155,7 @@ public class KAnonymityController {
             List<List<MedData>> newPartitions = new ArrayList<>();
             
             for (List<MedData> partition : partitions) {
-                if (partition.size() < 2 * k) {
+                if (partition.size() < (2 * k) - 1) {
                     newPartitions.add(partition);
                     continue;
                 }
@@ -201,9 +250,9 @@ public class KAnonymityController {
         int minAge = partition.stream().mapToInt(MedData::getAge).min().orElse(0);
         int maxAge = partition.stream().mapToInt(MedData::getAge).max().orElse(0);
         
-        if (minAge == maxAge) {
-            return String.valueOf(minAge);
-        }
+//        if (minAge == maxAge) {
+//            return String.valueOf(minAge);
+//        }
         
         int rangeSize = 10;
         int lowerBound = (minAge / rangeSize) * rangeSize;
@@ -220,9 +269,9 @@ public class KAnonymityController {
             .sorted()
             .collect(Collectors.toList());
         
-        if (postalCodes.size() == 1) {
-            return postalCodes.get(0);
-        }
+//        if (postalCodes.size() == 1) {
+//            return postalCodes.get(0);
+//        }
         
         String first = postalCodes.get(0);
         String last = postalCodes.get(postalCodes.size() - 1);
@@ -250,9 +299,9 @@ public class KAnonymityController {
             .distinct()
             .count();
         
-        if (uniqueGenders == 1) {
-            return partition.get(0).getGender();
-        }
+//        if (uniqueGenders == 1) {
+//            return partition.get(0).getGender();
+//        }
         
         return "*";
     }

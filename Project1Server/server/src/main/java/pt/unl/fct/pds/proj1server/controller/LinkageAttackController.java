@@ -25,7 +25,6 @@ public class LinkageAttackController {
     @Autowired
     private WorkDataRepository workDataRepository;
 
-
     @GetMapping("/attack")
     public List<LinkageResult> performLinkageAttack() {
         List<LinkageResult> results = new ArrayList<>();

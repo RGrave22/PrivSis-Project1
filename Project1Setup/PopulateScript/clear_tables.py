@@ -1,7 +1,7 @@
 from sqlalchemy import create_engine, text
 
 def main():
-    engine = create_engine("postgresql://postgres:password@localhost:5432/pds_proj_1")
+    engine = create_engine("postgresql://postgres:password@localhost:5433/pds_proj_1")
     
     with engine.connect() as conn:
         # Delete all data from tables

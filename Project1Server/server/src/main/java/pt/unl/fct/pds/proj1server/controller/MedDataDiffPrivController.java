@@ -2,11 +2,7 @@ package pt.unl.fct.pds.proj1server.controller;
 
 import org.springframework.beans.factory.annotation.Value;
 import pt.unl.fct.pds.proj1server.components.PrivacyBudgetManager;
-import pt.unl.fct.pds.proj1server.model.MedData;
-import pt.unl.fct.pds.proj1server.model.CountRequest;
-import pt.unl.fct.pds.proj1server.model.CountResponse;
-import pt.unl.fct.pds.proj1server.model.AverageRequest;
-import pt.unl.fct.pds.proj1server.model.AverageResponse;
+import pt.unl.fct.pds.proj1server.model.*;
 import pt.unl.fct.pds.proj1server.repository.MedDataRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -80,8 +76,9 @@ public class MedDataDiffPrivController {
         double noiseCount = Utils.addNoise(count, s, epsilon);
 
         budgetManager.consumeBudget(epsilon);
+        double remainingBudget = budgetManager.getRemainingBudget();
 
-        return new CountResponse(attribute, (int) noiseCount);
+        return new CountResponse(attribute, (int) noiseCount, s,  remainingBudget);
     }
     
     @GetMapping("/budget")
@@ -92,8 +89,7 @@ public class MedDataDiffPrivController {
 
     @PostMapping("/reset")
     public void resetBudget() {
-        budgetManager.resetBudget(10.0);
-
+        budgetManager.resetBudget(5.0);
     }
 
     @PostMapping("/average")
@@ -111,7 +107,7 @@ public class MedDataDiffPrivController {
         }
         long sum = 0;
         long count = 0;
-        double sensitivity; //maybe criar var de classe se formos usar mais vezes
+        double sensitivity;
 
         
         String[] parts = attribute.split(":");
@@ -127,7 +123,8 @@ public class MedDataDiffPrivController {
             
             sum = medDataRepository.sumAge() != null ? medDataRepository.sumAge() : 0;
             count = medDataRepository.count();
-            sensitivity = 100.0; //talvez mudar esse valor pq o gajo fala nos slides dos valores se forem reais pode dar merda 
+
+            sensitivity = 125.0;
 
         } else if (parts.length == 3) {
             String filterType = parts[1];
@@ -146,7 +143,7 @@ public class MedDataDiffPrivController {
                     HttpStatus.BAD_REQUEST,
                     "Invalid filter type. Supported: gender, diagnosis");
             }
-            sensitivity = 100.0; //talvez mudar este valor tou a assumir q o valor max é 100 mais q 100 ja e estica
+            sensitivity = 125.0;
         } else {
             throw new ResponseStatusException(
                 HttpStatus.BAD_REQUEST,
@@ -156,7 +153,7 @@ public class MedDataDiffPrivController {
         // Formula q tou a usar (sum + noise) / (count + noise) qualquer cena mudar
         
         double noisedSum = Utils.addNoise(sum, sensitivity, epsilonPerQuery);
-        double noisedCount = Utils.addNoise(count, 1.0, epsilonPerQuery);
+        double noisedCount = Utils.addNoise(count, 1.0  , epsilonPerQuery);
 
         
         double noisedAverage = noisedCount > 0 ? noisedSum / noisedCount : 0;
@@ -172,5 +169,73 @@ public class MedDataDiffPrivController {
             remainingBudget
         );
     }
+
+
+    @PostMapping("/average-raw")
+    public AverageResponse getAverageAgeRaw(@RequestBody AverageRequest averageRequest) {
+        String attribute = averageRequest.getAttribute();
+        if (attribute == null || attribute.isEmpty()) {
+            attribute = "age";
+        }
+
+        long sum = 0;
+        long count = 0;
+        double sensitivity = 0;
+        double remainingBudget = 0;
+
+        String[] parts = attribute.split(":");
+        String field = parts[0];
+
+        if (!field.equalsIgnoreCase("age")) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Only 'age' attribute is supported for average queries"
+            );
+        }
+
+        if (parts.length == 1) {
+            Long s = medDataRepository.sumAge();
+            sum = (s != null) ? s : 0L;
+            count = medDataRepository.count();
+            sensitivity = 125.0;
+        } else if (parts.length == 3) {
+            String filterType = parts[1];
+            String filterValue = parts[2];
+
+            if (filterType.equalsIgnoreCase("gender")) {
+                Long s = medDataRepository.sumAgeByGender(filterValue);
+                sum = (s != null) ? s : 0L;
+                count = medDataRepository.countByGender(filterValue);
+            } else if (filterType.equalsIgnoreCase("diagnosis")) {
+                Long s = medDataRepository.sumAgeByDiagnosis(filterValue);
+                sum = (s != null) ? s : 0L;
+                count = medDataRepository.countByDiagnosis(filterValue);
+            } else {
+                throw new ResponseStatusException(
+                        HttpStatus.BAD_REQUEST,
+                        "Invalid filter type. Supported: gender, diagnosis"
+                );
+            }
+
+
+        } else {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Invalid attribute format. Use 'age', 'age:gender:Male', or 'age:diagnosis:Diabetes'"
+            );
+        }
+
+        double average = (count > 0) ? ((double) sum) / ((double) count) : 0.0;
+
+
+
+        return new AverageResponse(
+                attribute,
+                average,
+                sensitivity,
+                remainingBudget
+        );
+    }
+
 }
 
