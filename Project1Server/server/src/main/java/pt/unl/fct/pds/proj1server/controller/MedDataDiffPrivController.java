@@ -237,5 +237,149 @@ public class MedDataDiffPrivController {
         );
     }
 
+
+    @PostMapping("/grouped-count")
+    public GroupedCountResponse getMedDataCount(@RequestBody GroupedCountRequest countRequest) {
+        String firstAtt = countRequest.getAttribute1();
+        String secondAtt = countRequest.getAttribute2();
+        String att1Value = countRequest.getValue1();
+        String att2Value = countRequest.getValue2();
+
+        if (!budgetManager.hasBudget(epsilon)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Privacy budget exhausted");
+        }
+
+        double s = 1.0;
+        long count = 0;
+
+        if (firstAtt == null || secondAtt == null || att1Value == null || att2Value == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Attributes and values are required");
+        }
+
+        if(firstAtt.equalsIgnoreCase(secondAtt)) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "You need to insert two different values"
+            );
+        }
+
+        String[] values = Utils.reorder(firstAtt, secondAtt, att1Value, att2Value);
+        String L  = values[0];
+        String R  = values[1];
+        String LV = values[2];
+        String RV = values[3];
+
+
+
+        switch (L) {
+            case "age":
+                int age = Integer.parseInt(LV);
+                switch (R) {
+                    case "diagnosis" : count = medDataRepository.countByAgeAndDiagnosis(age, RV); break;
+                    case "gender" : count = medDataRepository.countByAgeAndGender(age, RV); break;
+                    case "postal_code" : count = medDataRepository.countByAgeAndPostalCode(age, RV); break;
+
+                }
+            break;
+            case "gender":
+                switch (R) {
+                    case "diagnosis": count = medDataRepository.countByGenderAndDiagnosis(LV, RV); break;
+                    case "postal_code": count = medDataRepository.countByGenderAndPostalCode(LV, RV); break;
+                }
+            break;
+            case "diagnosis" :
+                if(R.equals("postal_code")) {
+                    count = medDataRepository.countByDiagnosisAndPostalCode(LV, RV);
+                }
+            break;
+            default:
+                throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Invalid attribute. Supported attributes: gender, diagnosis, age, postalCode");
+        }
+
+
+        double noiseCount = Utils.addNoise(count, s, epsilon);
+
+        budgetManager.consumeBudget(epsilon);
+        double remainingBudget = budgetManager.getRemainingBudget();
+
+        String attributesCounter = L + ":" + LV + " AND " + R + ":" + RV;
+
+        return new GroupedCountResponse(attributesCounter, (int) noiseCount, s, remainingBudget);
+    }
+
+
+
+    @PostMapping("/grouped-count-raw")
+    public GroupedCountResponse getMedDataCountRaw(@RequestBody GroupedCountRequest countRequest) {
+        String firstAtt = countRequest.getAttribute1();
+        String secondAtt = countRequest.getAttribute2();
+        String att1Value = countRequest.getValue1();
+        String att2Value = countRequest.getValue2();
+
+        long count = 0;
+
+        if (firstAtt == null || secondAtt == null || att1Value == null || att2Value == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Attributes and values are required");
+        }
+
+        if(firstAtt.equalsIgnoreCase(secondAtt)) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "You need to insert two different values"
+            );
+        }
+
+        String[] values = Utils.reorder(firstAtt, secondAtt, att1Value, att2Value);
+        String L  = values[0];
+        String R  = values[1];
+        String LV = values[2];
+        String RV = values[3];
+
+
+
+        switch (L) {
+            case "age":
+                int age = Integer.parseInt(LV);
+                switch (R) {
+                    case "diagnosis" : count = medDataRepository.countByAgeAndDiagnosis(age, RV); break;
+                    case "gender" : count = medDataRepository.countByAgeAndGender(age, RV); break;
+                    case "postal_code" : count = medDataRepository.countByAgeAndPostalCode(age, RV); break;
+
+                }
+                break;
+            case "gender":
+                switch (R) {
+                    case "diagnosis": count = medDataRepository.countByGenderAndDiagnosis(LV, RV); break;
+                    case "postal_code": count = medDataRepository.countByGenderAndPostalCode(LV, RV); break;
+                }
+                break;
+            case "diagnosis" :
+                if(R.equals("postal_code")) {
+                    count = medDataRepository.countByDiagnosisAndPostalCode(LV, RV);
+                }
+                break;
+            default:
+                throw new ResponseStatusException(
+                        HttpStatus.BAD_REQUEST,
+                        "Invalid attribute. Supported attributes: gender, diagnosis, age, postalCode");
+        }
+
+
+        String attributesCounter = L + ":" + LV + " AND " + R + ":" + RV;
+
+        return new GroupedCountResponse(attributesCounter, count, 0, 0);
+    }
+
+
+
+
 }
+
+
+
+
+
+
 

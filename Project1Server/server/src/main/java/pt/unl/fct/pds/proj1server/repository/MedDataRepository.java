@@ -11,7 +11,13 @@ public interface MedDataRepository extends JpaRepository<MedData, Long> {
     long countByDiagnosis(String diagnosis);
     long countByAge(int age);
     long countByPostalCode(String postalCode);
-    
+    long countByAgeAndGender(int age, String gender);
+    long countByAgeAndDiagnosis(int age, String diagnosis);
+    long countByAgeAndPostalCode(int age, String postalCode);
+    long countByGenderAndDiagnosis(String gender, String diagnosis);
+    long countByGenderAndPostalCode(String gender, String postalCode);
+    long countByDiagnosisAndPostalCode(String diagnosis, String postalCode);
+
     @Query("SELECT SUM(m.age) FROM MedData m")
     Long sumAge();
     

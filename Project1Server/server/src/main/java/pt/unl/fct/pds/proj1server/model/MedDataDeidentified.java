@@ -14,7 +14,10 @@ public class MedDataDeidentified {
     @Column(nullable = false)
     private String gender;
     @Column(nullable = false)
+    private String postalCode;
+    @Column(nullable = false)
     private String diagnosis;
+
 
     public MedDataDeidentified() {
     }
@@ -27,6 +30,7 @@ public class MedDataDeidentified {
         this.id = id;
         this.age = age;
         this.gender = gender;
+        this.postalCode = postalCode;
         this.diagnosis = diagnosis;
     }
 
@@ -35,10 +39,14 @@ public class MedDataDeidentified {
     public int getAge() {return age;}
     public String getGender() {return gender;}
     public String getDiagnosis() {return diagnosis;}
+    public String getPostalCode() {return postalCode;}
 
     public void setId(Long id) {this.id = id;}
     public void setAge(int age) {this.age = age;}
     public void setGender(String gender) {this.gender = gender;}
+    public void setPostalCode(String postalCode) {
+        this.postalCode = postalCode;
+    }
     public void setDiagnosis(String Diagnosis) {this.diagnosis = diagnosis;}
 }
 

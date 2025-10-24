@@ -21,18 +21,21 @@ public class Utils {
         return mu - (b * Math.signum(u) * Math.log(1 - 2 * Math.abs(u)));
     }
 
-    //Nao sei bem se vamos usar ou não o average
-    public static double getSensitivity(String queryType, List<?> data, double min, double max) {
-        switch (queryType.toLowerCase()) {
-            case "count":
-                return 1.0;
-            case "average":
-                if (data.isEmpty()) return 0.0;
-                return (max - min) / data.size();//TODO nao sei se ta bem feito - ver livro!!!
-            case "gCount":
-                return 0; //TODO
-            default:
-                throw new IllegalArgumentException("Query unknown.");
-        }
+
+    public static String[] reorder(String a1, String a2, String v1, String v2) {
+        String x = a1.toLowerCase();
+        String y = a2.toLowerCase();
+
+
+        boolean xy = x.compareTo(y) <= 0;
+
+        String leftAttr  = xy ? x  : y;
+        String rightAttr = xy ? y  : x;
+
+
+        String leftVal  = a1.equalsIgnoreCase(leftAttr)  ? v1 : v2;
+        String rightVal = a2.equalsIgnoreCase(rightAttr) ? v2 : v1;
+
+        return new String[]{ leftAttr, rightAttr, leftVal, rightVal };
     }
 }

@@ -2,58 +2,52 @@ package pt.unl.fct.pds.proj1server.model;
 
 public class GroupedCountRequest {
 
-    private String attribute;
-    private String aValue;
-    private String condition;
-    private String cValue;
+    private String attribute1;
+    private String value1;
+    private String attribute2;
+    private String value2;
 
     public GroupedCountRequest() {
     }
 
-    public GroupedCountRequest(
-            String attribute,
-            String aValue, String condition, String cValue) {
-        this.attribute = attribute;
-        this.aValue = aValue;
-        this.condition = condition;
-        this.cValue = cValue;
+    public GroupedCountRequest(String attribute1, String value1,
+                               String attribute2, String value2) {
+        this.attribute1 = attribute1;
+        this.value1 = value1;
+        this.attribute2 = attribute2;
+        this.value2 = value2;
     }
 
-    public String getAttribute() {
-        return attribute;
+    public String getAttribute1() {
+        return attribute1;
     }
 
-    public void setAttribute(String attribute) {
-        this.attribute = attribute;
+    public void setAttribute1(String attribute1) {
+        this.attribute1 = attribute1;
     }
 
-    public String getaValue() {
-        return aValue;
+    public String getValue1() {
+        return value1;
     }
 
-    public void setaValue(String aValue) {
-        this.aValue = aValue;
+    public void setValue1(String value1) {
+        this.value1 = value1;
     }
 
-    public String getCondition() {
-        return condition;
+    public String getAttribute2() {
+        return attribute2;
     }
 
-    public void setCondition(String condition) {
-        this.condition = condition;
+    public void setAttribute2(String attribute2) {
+        this.attribute2 = attribute2;
     }
 
-    public String getcValue() {
-        return cValue;
+    public String getValue2() {
+        return value2;
     }
 
-    public void setcValue(String cValue) {
-        this.cValue = cValue;
+    public void setValue2(String value2) {
+        this.value2 = value2;
     }
-
-
-
-
-
 
 }
