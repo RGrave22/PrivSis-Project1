@@ -49,12 +49,6 @@ public class MedDataDiffPrivController {
         long count = 0;
 
         switch (attribute.toLowerCase()) {
-            case "gender":
-                count = medDataRepository.countByGender(value);
-                break;
-            case "diagnosis":
-                count = medDataRepository.countByDiagnosis(value);
-                break;
             case "age":
                 try {
                     int ageValue = Integer.parseInt(value);
@@ -64,13 +58,28 @@ public class MedDataDiffPrivController {
                             HttpStatus.BAD_REQUEST, "Age must be a valid number");
                 }
                 break;
+            case "gender":
+                count = medDataRepository.countByGender(value);
+                break;
+            case "diagnosis":
+                count = medDataRepository.countByDiagnosis(value);
+                break;
             case "postal_code":
                 count = medDataRepository.countByPostalCode(value);
+                break;
+            case "address":
+                count = medDataRepository.countByAddress(value);
+                break;
+            case "name":
+                count = medDataRepository.countByName(value);
+                break;
+            case "email":
+                count = medDataRepository.countByEmail(value);
                 break;
             default:
                 throw new ResponseStatusException(
                         HttpStatus.BAD_REQUEST,
-                        "Invalid attribute. Supported attributes: gender, diagnosis, age, postalCode");
+                        "Invalid attribute. Supported attributes: age, gender, diagnosis, postal_code, address, name, email");
         }
 
         double noiseCount = Utils.addNoise(count, s, epsilon);
@@ -78,9 +87,9 @@ public class MedDataDiffPrivController {
         budgetManager.consumeBudget(epsilon);
         double remainingBudget = budgetManager.getRemainingBudget();
 
-        return new CountResponse(attribute, (int) noiseCount, s,  remainingBudget);
+        return new CountResponse(attribute, (int) noiseCount, s, remainingBudget);
     }
-    
+
     @GetMapping("/budget")
     public double getRemainingBudget() {
         
@@ -92,6 +101,7 @@ public class MedDataDiffPrivController {
         budgetManager.resetBudget(5.0);
     }
 
+    //TODO ADICIONAR O AVERAGE DA AGE COM O RESTO DOS ATRIBUTOS TODOS :)
     @PostMapping("/average")
     public AverageResponse getAverageAge(@RequestBody AverageRequest averageRequest) {
         
@@ -269,35 +279,58 @@ public class MedDataDiffPrivController {
         String LV = values[2];
         String RV = values[3];
 
-
-
         switch (L) {
             case "age":
                 int age = Integer.parseInt(LV);
                 switch (R) {
-                    case "diagnosis" : count = medDataRepository.countByAgeAndDiagnosis(age, RV); break;
-                    case "gender" : count = medDataRepository.countByAgeAndGender(age, RV); break;
-                    case "postal_code" : count = medDataRepository.countByAgeAndPostalCode(age, RV); break;
-
+                    case "gender": count = medDataRepository.countByAgeAndGender(age, RV); break;
+                    case "diagnosis": count = medDataRepository.countByAgeAndDiagnosis(age, RV); break;
+                    case "postal_code": count = medDataRepository.countByAgeAndPostalCode(age, RV); break;
+                    case "address": count = medDataRepository.countByAgeAndAddress(age, RV); break;
+                    case "name": count = medDataRepository.countByAgeAndName(age, RV); break;
+                    case "email": count = medDataRepository.countByAgeAndEmail(age, RV); break;
                 }
-            break;
+                break;
             case "gender":
                 switch (R) {
                     case "diagnosis": count = medDataRepository.countByGenderAndDiagnosis(LV, RV); break;
                     case "postal_code": count = medDataRepository.countByGenderAndPostalCode(LV, RV); break;
+                    case "address": count = medDataRepository.countByGenderAndAddress(LV, RV); break;
+                    case "name": count = medDataRepository.countByGenderAndName(LV, RV); break;
+                    case "email": count = medDataRepository.countByGenderAndEmail(LV, RV); break;
                 }
-            break;
-            case "diagnosis" :
-                if(R.equals("postal_code")) {
-                    count = medDataRepository.countByDiagnosisAndPostalCode(LV, RV);
+                break;
+            case "diagnosis":
+                switch (R) {
+                    case "postal_code": count = medDataRepository.countByDiagnosisAndPostalCode(LV, RV); break;
+                    case "address": count = medDataRepository.countByDiagnosisAndAddress(LV, RV); break;
+                    case "name": count = medDataRepository.countByDiagnosisAndName(LV, RV); break;
+                    case "email": count = medDataRepository.countByDiagnosisAndEmail(LV, RV); break;
                 }
-            break;
+                break;
+            case "postal_code":
+                switch (R) {
+                    case "address": count = medDataRepository.countByPostalCodeAndAddress(LV, RV); break;
+                    case "name": count = medDataRepository.countByPostalCodeAndName(LV, RV); break;
+                    case "email": count = medDataRepository.countByPostalCodeAndEmail(LV, RV); break;
+                }
+                break;
+            case "address":
+                switch (R) {
+                    case "name": count = medDataRepository.countByAddressAndName(LV, RV); break;
+                    case "email": count = medDataRepository.countByAddressAndEmail(LV, RV); break;
+                }
+                break;
+            case "name":
+                if (R.equals("email")) {
+                    count = medDataRepository.countByNameAndEmail(LV, RV);
+                }
+                break;
             default:
                 throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST,
-                    "Invalid attribute. Supported attributes: gender, diagnosis, age, postalCode");
+                        HttpStatus.BAD_REQUEST,
+                        "Invalid attribute. Supported attributes: age, gender, diagnosis, postal_code, address, name, email");
         }
-
 
         double noiseCount = Utils.addNoise(count, s, epsilon);
 
