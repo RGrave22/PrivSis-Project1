@@ -26,12 +26,10 @@ public class Utils {
         String x = a1.toLowerCase();
         String y = a2.toLowerCase();
 
-
         boolean xy = x.compareTo(y) <= 0;
 
         String leftAttr  = xy ? x  : y;
         String rightAttr = xy ? y  : x;
-
 
         String leftVal  = a1.equalsIgnoreCase(leftAttr)  ? v1 : v2;
         String rightVal = a2.equalsIgnoreCase(rightAttr) ? v2 : v1;
