@@ -101,7 +101,6 @@ public class MedDataDiffPrivController {
         budgetManager.resetBudget(5.0);
     }
 
-    //TODO ADICIONAR O AVERAGE DA AGE COM O RESTO DOS ATRIBUTOS TODOS :)
     @PostMapping("/average")
     public AverageResponse getAverageAge(@RequestBody AverageRequest averageRequest) {
         
@@ -148,16 +147,32 @@ public class MedDataDiffPrivController {
                 sum = medDataRepository.sumAgeByDiagnosis(filterValue) != null ? 
                       medDataRepository.sumAgeByDiagnosis(filterValue) : 0;
                 count = medDataRepository.countByDiagnosis(filterValue);
+            } else if (filterType.equalsIgnoreCase("postal_code")) {
+                sum = medDataRepository.sumAgeByPostalCode(filterValue) != null ? 
+                      medDataRepository.sumAgeByPostalCode(filterValue) : 0;
+                count = medDataRepository.countByPostalCode(filterValue);
+            } else if (filterType.equalsIgnoreCase("address")) {
+                sum = medDataRepository.sumAgeByAddress(filterValue) != null ? 
+                      medDataRepository.sumAgeByAddress(filterValue) : 0;
+                count = medDataRepository.countByAddress(filterValue);
+            } else if (filterType.equalsIgnoreCase("name")) {
+                sum = medDataRepository.sumAgeByName(filterValue) != null ? 
+                      medDataRepository.sumAgeByName(filterValue) : 0;
+                count = medDataRepository.countByName(filterValue);
+            } else if (filterType.equalsIgnoreCase("email")) {
+                sum = medDataRepository.sumAgeByEmail(filterValue) != null ? 
+                      medDataRepository.sumAgeByEmail(filterValue) : 0;
+                count = medDataRepository.countByEmail(filterValue);
             } else {
                 throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST,
-                    "Invalid filter type. Supported: gender, diagnosis");
+                    "Invalid filter type. Supported: gender, diagnosis, postal_code, address, name, email");
             }
             sensitivity = 125.0;
         } else {
             throw new ResponseStatusException(
                 HttpStatus.BAD_REQUEST,
-                "Invalid attribute format. Use 'age', 'age:gender:<genderValue>', or 'age:diagnosis:<diagnosisValue>>'");
+                "Invalid attribute format. Use 'age', 'age:gender:<value>', 'age:diagnosis:<value>', 'age:postal_code:<value>', 'age:address:<value>', 'age:name:<value>', or 'age:email:<value>'");
         }
 
         // Formula q tou a usar (sum + noise) / (count + noise) qualquer cena mudar
@@ -220,10 +235,26 @@ public class MedDataDiffPrivController {
                 Long s = medDataRepository.sumAgeByDiagnosis(filterValue);
                 sum = (s != null) ? s : 0L;
                 count = medDataRepository.countByDiagnosis(filterValue);
+            } else if (filterType.equalsIgnoreCase("postal_code")) {
+                Long s = medDataRepository.sumAgeByPostalCode(filterValue);
+                sum = (s != null) ? s : 0L;
+                count = medDataRepository.countByPostalCode(filterValue);
+            } else if (filterType.equalsIgnoreCase("address")) {
+                Long s = medDataRepository.sumAgeByAddress(filterValue);
+                sum = (s != null) ? s : 0L;
+                count = medDataRepository.countByAddress(filterValue);
+            } else if (filterType.equalsIgnoreCase("name")) {
+                Long s = medDataRepository.sumAgeByName(filterValue);
+                sum = (s != null) ? s : 0L;
+                count = medDataRepository.countByName(filterValue);
+            } else if (filterType.equalsIgnoreCase("email")) {
+                Long s = medDataRepository.sumAgeByEmail(filterValue);
+                sum = (s != null) ? s : 0L;
+                count = medDataRepository.countByEmail(filterValue);
             } else {
                 throw new ResponseStatusException(
                         HttpStatus.BAD_REQUEST,
-                        "Invalid filter type. Supported: gender, diagnosis"
+                        "Invalid filter type. Supported: gender, diagnosis, postal_code, address, name, email"
                 );
             }
 
@@ -231,7 +262,7 @@ public class MedDataDiffPrivController {
         } else {
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST,
-                    "Invalid attribute format. Use 'age', 'age:gender:Male', or 'age:diagnosis:Diabetes'"
+                    "Invalid attribute format. Use 'age', 'age:gender:<value>', 'age:diagnosis:<value>', 'age:postal_code:<value>', 'age:address:<value>', 'age:name:<value>', or 'age:email:<value>'"
             );
         }
 
