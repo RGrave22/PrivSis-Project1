@@ -94,7 +94,7 @@ GET `/api/meddata/{id}`
 Retorna um registo por id.
 
 POST `/api/meddata/count`
-Conta registos nos dados originais. Corpo JSON exemplo:
+Conta registos nos dados originais. JSON exemplo:
 
 ```json
 {
@@ -139,10 +139,10 @@ Gera e retorna uma lista de `KAnonymizedData` aplicando um algoritmo do tipo Mon
 `GET http://localhost:8000/api/kanonymity?k=3`
 
 GET `/api/kanonymity/stats?k=<valor>`
-Calcula estatísticas da aplicação de k‑anonymity (registos totais, retidos, suprimidos, taxa de retenção, número de classes de equivalência, média do tamanho das classes, técnica usada).
+Calcula estatísticas do k‑anonymity (registos totais, retidos, suprimidos, taxa de retenção, número de classes de equivalência, média do tamanho das classes, técnica usada).
 
 GET `/api/kanonymity/test-attack?k=<valor>`
-Executa uma avaliação de linkage entre os dados k‑anonimizados e `WorkData` usando `postal_code prefix` + `gender` para medir quantos registos podem ser ligados.
+Executa uma teste de linkage entre os dados k‑anonimizados e `WorkData` usando `postal_code prefix` + `gender` para medir quantos registos podem ser ligados.
 
 GET `/api/kanonymity/attack-stats?k=<valor>`
 Retorna métricas sobre a vulnerabilidade após aplicação de k‑anonymity (success rate, uniqueness rate, etc.).
