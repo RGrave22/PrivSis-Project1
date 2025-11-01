@@ -1,7 +1,9 @@
 # PrivSis-Project1
 Para correr deve se entrar na pasta server e correr os seguintes comandos
 
+
 ```powershell
+docker run --name testPostgres -e POSTGRES_PASSWORD=password \ -e POSTGRES˙DB=pds_proj_1 -d -p 5432:5432 postgres
 cd Project1Server/server
 mvn clean complie package
 mvn spring-boot:run
@@ -9,7 +11,13 @@ mvn spring-boot:run
 
 O servidor sobe por defeito na porta 8000. Base URL: `http://localhost:8000/api/dp`.
 
-Configuração de privacidade
+Deve tambem correr o populate 
+
+python3 -m venv .
+source bin/activate
+pip3 install sqlalchemy
+pip3 install psycopg2-binary
+python3 populatetables.py
 
 # Diferencial Privacy
 Os valores por defeito em `src/main/resources/application.properties` são:
